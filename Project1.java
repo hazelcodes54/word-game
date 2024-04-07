@@ -1,35 +1,34 @@
+import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Scanner;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
 
 public class Project1 extends JFrame {
 
     private static final int MIN_WORD_LENGTH = 5;
     private String puzzleLetters;
-    private ArrayList<String> solutions;
+    private UnsortedWordList solutions;
+    private SortedWordList guessedWords;
     private JTextArea foundWordsArea;
     private JLabel scoreLabel;
+    private int score = 0;
 
     public Project1(String fileName) throws FileNotFoundException {
         super("Spelling Beehive");
-        this.solutions = new ArrayList<>();
-        this.readInput(fileName);
-        this.createGUI();
-        this.scoreLabel.setText("Score: 0");
+        solutions = new UnsortedWordList();
+        guessedWords = new SortedWordList();
+        readInput(fileName);
+        createGUI();
+        scoreLabel.setText("Score: 0");
     }
 
     private void readInput(String fileName) throws FileNotFoundException {
         File file = new File(fileName);
         Scanner scanner = new Scanner(file);
-        this.puzzleLetters = scanner.nextLine().toUpperCase();
+        puzzleLetters = scanner.nextLine().toUpperCase();
         while (scanner.hasNextLine()) {
-            solutions.add(scanner.nextLine().toUpperCase());
+            String word = scanner.nextLine().toUpperCase();
+            solutions.add(new Word(word)); // Assume Word is your class wrapping string.
         }
         scanner.close();
     }
@@ -56,26 +55,42 @@ public class Project1 extends JFrame {
         while (true) {
             String guess = JOptionPane.showInputDialog(this, "Enter a word (at least 5 letters):").toUpperCase();
             if (guess == null) {
-                break;
+                break; // Exit the loop if cancel is clicked
             }
 
             if (!isValidWord(guess)) {
-                continue;
+                continue; // Skip the rest of the loop and ask for another guess.
             }
 
-            if (solutions.contains(guess)) {
-                foundWordsArea.append(guess + "\n");
-                solutions.remove(guess);
-                scoreLabel.setText("Score: " + foundWordsArea.getLineCount());
+            if (solutions.contains(new Word(guess))) {
+                solutions.remove(new Word(guess)); // Remove from solutions list.
+                guessedWords.add(new Word(guess)); // Add to guessed words list.
+                
+                int points = guess.containsAllLetters(puzzleLetters) ? 3 : 1; // Custom method to check if all letters are contained.
+                score += points;
+                
+                scoreLabel.setText("Score: " + score);
+                updateFoundWordsArea();
             } else {
-                JOptionPane.showMessageDialog(this, "Invalid guess!");
+                JOptionPane.showMessageDialog(this, "Invalid guess or word already guessed!");
             }
+        }
+    }
+
+    private void updateFoundWordsArea() {
+        foundWordsArea.setText(""); 
+        for (Word word : guessedWords) { 
+            foundWordsArea.append(word.getWord() + "\n"); // Display guessed words.
         }
     }
 
     private boolean isValidWord(String guess) {
         if (guess.length() < MIN_WORD_LENGTH) {
             JOptionPane.showMessageDialog(this, "Word must be at least 5 letters long!");
+            return false;
+        }
+        if (!guess.startsWith(String.valueOf(puzzleLetters.charAt(0)))) {
+            JOptionPane.showMessageDialog(this, "Word must start with the specified letter!");
             return false;
         }
         for (char letter : guess.toCharArray()) {
