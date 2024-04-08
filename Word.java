@@ -2,20 +2,28 @@ public class Word implements Comparable<Word> {
     private String word;
 
     public Word(String word) {
-        this.word = word.toUpperCase();
+        this.word = word.toUpperCase(); // Assuming words are case-insensitive
     }
 
     public String getWord() {
-        return word;
+        return this.word;
     }
 
     @Override
-    public int compareTo(Word anotherWord) {
-        return this.word.compareTo(anotherWord.getWord());
+    public int compareTo(Word other) {
+        return this.word.compareTo(other.word);
     }
 
     @Override
-    public String toString() {
-        return word;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Word wordObj = (Word) o;
+        return word.equals(wordObj.word);
+    }
+
+    @Override
+    public int hashCode() {
+        return word.hashCode();
     }
 }

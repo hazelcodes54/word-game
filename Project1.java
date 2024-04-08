@@ -66,7 +66,7 @@ public class Project1 extends JFrame {
                 solutions.remove(new Word(guess)); // Remove from solutions list.
                 guessedWords.add(new Word(guess)); // Add to guessed words list.
                 
-                int points = guess.containsAllLetters(puzzleLetters) ? 3 : 1; // Custom method to check if all letters are contained.
+                int points = containsAllLetters(guess, puzzleLetters) ? 3 : 1; // Now using the helper method.
                 score += points;
                 
                 scoreLabel.setText("Score: " + score);
@@ -78,10 +78,19 @@ public class Project1 extends JFrame {
     }
 
     private void updateFoundWordsArea() {
-        foundWordsArea.setText(""); 
-        for (Word word : guessedWords) { 
+        foundWordsArea.setText("");
+        for (Word word : guessedWords) {
             foundWordsArea.append(word.getWord() + "\n"); // Display guessed words.
         }
+    }
+
+    private boolean containsAllLetters(String guess, String puzzleLetters) {
+        for (char letter : puzzleLetters.toCharArray()) {
+            if (!guess.contains(String.valueOf(letter))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean isValidWord(String guess) {

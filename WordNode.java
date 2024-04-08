@@ -1,9 +1,9 @@
 public class WordNode {
-    protected Word data;
-    protected WordNode next;
+    protected Word data; // This should be the word object
+    protected WordNode next; // This should be the reference to the next node
 
-    public WordNode(Word w) {
-        this.data = w;
-        this.next = null;  //the next node doesn't exist.
+    public WordNode(Word data) {
+        this.data = data;
+        this.next = null;
     }
 }
